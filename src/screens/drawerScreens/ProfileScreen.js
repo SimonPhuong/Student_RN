@@ -1,14 +1,36 @@
-import * as React from 'react';
+import {useContext, useState, useEffect} from 'react';
 import {View, Text, StyleSheet, Image, FlatList, ScrollView} from 'react-native';
 import {AuthContext} from '../../context/AuthContext'
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import Button from '../../components/Button';
 import moment from 'moment';
+import axios from 'axios';
+import {BASE_URL} from '../../config';
 
 
 const Profile = ({navigation}) => {
 
-  const {userInfo, studentInfo, handleLogout} = React.useContext(AuthContext);
+  const {userInfo, handleLogout} = useContext(AuthContext);
+  const [studentInfo, setStudentInfo] = useState({});
+
+  useEffect(() => {
+    getStudentInfo();
+  }, []);
+  const getStudentInfo = async () => {
+    axios
+    .get(`${BASE_URL}/profile.php`, {
+      headers: { Authorization: `Bearer ${userInfo.access_token}` },
+    })
+    .then((res) => {
+      const studentInfo = res.data.data;
+      console.log(res.data.data);
+      setStudentInfo(studentInfo);
+    })
+    .catch((error) => {
+      console.error(error);
+    });    
+  };
+
   return (
     
     <View style={styles.container}>
@@ -18,8 +40,7 @@ const Profile = ({navigation}) => {
               onPress={() => navigation.navigate('HomeScreen')}>
             <Image source={require('../../assets/images/backArrow/backArrow.png')}
               style={styles.icon} />
-            </TouchableOpacity> */}
-            
+            </TouchableOpacity> */}     
           <Text style={[styles.headerText]}></Text>
         </View>
       </View>
@@ -75,7 +96,7 @@ const Profile = ({navigation}) => {
           </View>
           <View style={styles.list}>
             <Text style={styles.listItem}>Phone: </Text>
-            <Text style={styles.itemDetail}>{studentInfo.phone}</Text>
+            <Text style={styles.itemDetail}>0{studentInfo.phone}</Text>
           </View>
           <Button
             style={styles.logout}

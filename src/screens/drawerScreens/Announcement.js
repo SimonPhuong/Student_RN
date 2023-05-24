@@ -1,14 +1,21 @@
-import { View, Text } from 'react-native'
+import { View, Text, StyleSheet } from 'react-native'
 import React from 'react'
-import { TailwindProvider } from 'tailwindcss-react-native';
 const Announcement = () => {
   return (
-    <TailwindProvider>
-        <View className="flex-1 items-center justify-center bg-white">
-            <Text>Open up App.js to start working on your app!</Text>
-        </View>
-    </TailwindProvider>
+    <View style={styles.container}>
+        <Text style={styles.text}>Announcement</Text>
+    </View>
   )
 }
-
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  text: {
+    fontWeight: 500,
+    fontSize: 20,
+  },
+});
 export default Announcement

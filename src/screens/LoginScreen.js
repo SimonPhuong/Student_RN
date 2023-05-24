@@ -6,7 +6,7 @@ import {  View,
           KeyboardAvoidingView,
           TouchableWithoutFeedback,
           Keyboard,
-          Image } from 'react-native';
+          Image,Alert } from 'react-native';
 // import * as SecureStore from 'expo-secure-store';
 // import Spinner from 'react-native-loading-spinner-overlay';
 import {AuthContext} from '../context/AuthContext';
@@ -18,9 +18,23 @@ const LoginScreen = () => {
   
   const [id_user, setId] = useState('');
   const [password, setPassword] = useState('');
+  const [idError, setIdError] = useState(false);
+  const [passwordError, setPasswordError] = useState(false);
 
   const {handleLogin} = useContext(AuthContext);
 
+  const validateInputs = () => {
+    if (id_user.trim() === '') {
+      setIdError(true);
+    } else {
+      setIdError(false);
+    }
+    if (password.trim() === '') {
+      setPasswordError(true);
+    } else {
+      setPasswordError(false);
+    }
+  };
   return (
     
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
@@ -47,19 +61,39 @@ const LoginScreen = () => {
                   placeholder="ID User"
                   icon={require('../assets/images/account/account.png')}
                   onChangeText={(text) => setId(text)}
-                  
+                  style={[
+                    styles.textInput,
+                    idError && { borderBottomColor: 'red' }
+                  ]}
                 />
+                {idError && (
+                  <Text style={styles.errorText}>
+                    Please enter a valid ID User
+                  </Text>
+                )}
                 <TextInput
                   value={password}
                   placeholder="Password"
                   secureTextEntry={true}
                   icon={require('../assets/images/password/password.png')}
                   onChangeText={(text) => setPassword(text)}
+                  style={[
+                    styles.textInput,
+                    passwordError && { borderBottomColor: 'red' }
+                  ]}
                 />
+                {passwordError && (
+                  <Text style={[styles.errorText]}>
+                    Please enter a valid Password
+                  </Text>
+                )}
                 <Button 
                       title = "Login"
                       onPress={() => {
+                        validateInputs();
+                        if (!idError && !passwordError) {
                           handleLogin(id_user, password);
+                        } 
                       }}>
                 </Button>
               </View>
@@ -134,7 +168,17 @@ const styles = StyleSheet.create({
     bottom: 0,
     flex: 1,
   },
-
+  textInput: {
+    // Your existing styles for text input
+    borderBottomWidth: 1,
+    borderBottomColor: '#ccc',
+    // ...
+  },
+  errorText: {
+    color: 'red',
+    textAlign: 'right',
+    paddingTop: 10,
+  },
 });
 
 export default LoginScreen;

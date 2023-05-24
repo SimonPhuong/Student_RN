@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {TextInput, StyleSheet, View, Text, SafeAreaView} from 'react-native';
+import {TextInput, StyleSheet, View, Text, SafeAreaView, Alert} from 'react-native';
 import {AuthContext} from '../../context/AuthContext'
 import Button from '../../components/Button';
 
@@ -15,7 +15,30 @@ const ChangePassword = ({navigation}) => {
   const [password_new, setPasswordNew] = React.useState('');
   const [password_confirm, setPasswordConfirm] = React.useState('');
 
+  const [isPasswordCurrentValid, setIsPasswordCurrentValid] = React.useState(true);
+  const [isPasswordNewValid, setIsPasswordNewValid] = React.useState(true);
+  const [isPasswordConfirmValid, setIsPasswordConfirmValid] = React.useState(true);
+  const [isValid, setIsValid] = React.useState(true);
+
   const handleChangePassword = (password_current, password_new, password_confirm) => {
+    if (!password_current) {
+      setIsPasswordCurrentValid(false);
+      return;
+    }
+    if (!password_new) {
+      setIsPasswordNewValid(false);
+      return;
+    }
+    if (password_new !== password_confirm) {
+      setIsPasswordConfirmValid(false);
+      return;
+    }
+
+    // Reset validation state
+    setIsPasswordCurrentValid(true);
+    setIsPasswordNewValid(true);
+    setIsPasswordConfirmValid(true);
+
     axios.post(`${BASE_URL}/change-password.php`,{password_current, password_new, password_confirm},
       {
       headers: {Authorization: `Bearer ${userInfo.access_token}`},
@@ -25,15 +48,15 @@ const ChangePassword = ({navigation}) => {
       // Handle success response
       console.log(res.data);
       // Show success message to the user
-      alert('Your password has been change!');
+      Alert.alert('Successfully!','Your password has been change!');
       // Clear the input fields
       setPasswordCurrent('');
       setPasswordNew('');
       setPasswordConfirm('');
     })
     .catch(e => {
-      console.log(`error ${e}`);
-      setIsLoading(false);
+      // console.log(`error ${e}`);
+      Alert.alert('Error!','Check again your current password!');
     });
 
   };
@@ -51,7 +74,7 @@ const ChangePassword = ({navigation}) => {
                 Current password
             </Text>
             <TextInput
-                style={styles.input}
+                style={[styles.input, !isPasswordCurrentValid && styles.inputInvalid]}
                 onChangeText={(text) => setPasswordCurrent(text)}
                 value={password_current}
                 secureTextEntry={true}
@@ -62,19 +85,21 @@ const ChangePassword = ({navigation}) => {
                 New password
             </Text>
             <TextInput
-                style={styles.input}
+                style={[styles.input, !isPasswordNewValid && styles.inputInvalid]}
                 onChangeText={(text) => setPasswordNew(text)}
                 value={password_new}
+                secureTextEntry={true}
             />
         </View>
         <View style={{marginBottom: 10}}>
             <Text style={styles.label}>
-                New password
+                Confirm password
             </Text>
             <TextInput
-                style={styles.input}
+                style={[styles.input, !isPasswordConfirmValid && styles.inputInvalid]}
                 onChangeText={(text) => setPasswordConfirm(text)}
                 value={password_confirm}
+                secureTextEntry={true}
             />  
         </View>
         <View>
@@ -118,7 +143,12 @@ const styles = StyleSheet.create({
   },
   button: {
     padding: 15,
-  }
+  },
+
+  inputInvalid: {
+    borderWidth: 1,
+    borderColor: 'red',
+  },
 });
 
 

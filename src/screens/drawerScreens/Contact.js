@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {TextInput, StyleSheet, View, Text, SafeAreaView} from 'react-native';
+import {TextInput, StyleSheet, View, Text, SafeAreaView, TouchableWithoutFeedback, Keyboard} from 'react-native';
 import Textarea from 'react-native-textarea';
 import {AuthContext} from '../../context/AuthContext'
 import Button from '../../components/Button';
@@ -9,7 +9,12 @@ import {BASE_URL} from '../../config';
 
 const Contact = ({navigation}) => {
 
-  
+  const HideKeyboard = ({ children }) => (
+    <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
+      {children}
+    </TouchableWithoutFeedback>
+  );
+
   const {userInfo, studentInfo} = React.useContext(AuthContext);
 
   const [headline, setHeadline] = React.useState('');
@@ -25,7 +30,7 @@ const Contact = ({navigation}) => {
       // Handle success response
       console.log(res.data);
       // Show success message to the user
-      alert('Your message has been sent successfully!');
+      alert('Successfully','Your message has been sent successfully!');
       // Clear the input fields
       setHeadline('');
       setMessage('');
@@ -38,6 +43,7 @@ const Contact = ({navigation}) => {
   };
 
   return (
+    <HideKeyboard>
     <SafeAreaView style={{flex: 1, flexDirection: 'column'}}>
       <View style={styles.title}>
         <Text style={styles.textTitle}>
@@ -51,7 +57,7 @@ const Contact = ({navigation}) => {
           </Text>
           <TextInput
             style={styles.input}
-            value={studentInfo.first_name + ' ' + studentInfo.last_name}
+            value={userInfo.first_name + ' ' + userInfo.last_name}
             editable={false}  
           />
         </View>
@@ -82,6 +88,7 @@ const Contact = ({navigation}) => {
             Message
           </Text>
           <View style={{padding: 15}}>
+          
             <Textarea
               containerStyle={styles.textareaContainer}
               style={styles.textarea}
@@ -89,7 +96,11 @@ const Contact = ({navigation}) => {
               placeholder={'Type your message here...'}
               onChangeText={(text) => setMessage(text)}
               value={message}
+              
             />
+
+            
+            
           </View>
         </View>
         <View>
@@ -103,6 +114,7 @@ const Contact = ({navigation}) => {
         </View>
       </View>
     </SafeAreaView>
+    </HideKeyboard>
   );
 };
 
